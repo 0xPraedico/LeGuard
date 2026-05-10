@@ -14,7 +14,10 @@ use config::ValidationConfig;
 use dataset::scan_dataset;
 use report::{DatasetSummary, IssueCounts, RunMetadata, ValidationReport};
 
-use crate::checks::{annotation, numerical, schema, structure, temporal, video};
+use crate::checks::{
+    annotation, consistency, episodes, numerical, portability, schema, structure, temporal,
+    training, video,
+};
 
 pub const REPORT_SCHEMA_VERSION: &str = "1.0.0";
 
@@ -34,6 +37,12 @@ pub fn run_validation(path: &Path, config: ValidationConfig) -> Result<Validatio
         if config.checks.schema {
             issues.extend(schema::run(scan));
         }
+        if config.checks.consistency {
+            issues.extend(consistency::run(scan, &config));
+        }
+        if config.checks.episodes {
+            issues.extend(episodes::run(scan, &config));
+        }
         if config.checks.temporal {
             issues.extend(temporal::run(scan, &config));
         }
@@ -45,6 +54,12 @@ pub fn run_validation(path: &Path, config: ValidationConfig) -> Result<Validatio
         }
         if config.checks.annotation {
             issues.extend(annotation::run(scan));
+        }
+        if config.checks.training {
+            issues.extend(training::run(scan, &config));
+        }
+        if config.checks.portability {
+            issues.extend(portability::run(scan));
         }
     }
 

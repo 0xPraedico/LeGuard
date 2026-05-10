@@ -1,5 +1,5 @@
 {
-  "description": "Exemple de dataset LeRobot variant avec taxonomie custom",
+  "description": "Example LeRobot variant dataset with a custom taxonomy",
   "columns": [
     "episode_index",
     "frame_index",
@@ -7,5 +7,5 @@
     "action",
     "observation.images.front"
   ],
-  "note": "Utiliser examples/variant-config.yml pour assouplir certains checks."
+  "note": "Use examples/variant-config.yml to relax specific checks."
 }

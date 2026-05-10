@@ -25,6 +25,10 @@ enum Commands {
         config: Option<PathBuf>,
         #[arg(long, value_enum, default_value_t = FailOn::Error)]
         fail_on: FailOn,
+        #[arg(long, help = "Comma-separated checks to run")]
+        checks: Option<String>,
+        #[arg(long, help = "Limit the number of episodes inspected")]
+        max_episodes: Option<usize>,
     },
     Report {
         path: PathBuf,
@@ -59,10 +63,14 @@ fn main() -> Result<()> {
             path,
             config,
             fail_on,
+            checks,
+            max_episodes,
         } => commands::check::run(CheckCommand {
             path,
             config,
             fail_on,
+            checks,
+            max_episodes,
         })?,
         Commands::Report {
             path,

@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use arrow_array::{
     Array, Float32Array, Float64Array, Int16Array, Int32Array, Int64Array, Int8Array, UInt16Array,
@@ -25,6 +25,7 @@ struct EpisodeState {
 pub fn run(scan: &DatasetScan, config: &ValidationConfig) -> Vec<Issue> {
     let mut issues = Vec::new();
     let mut episode_states: HashMap<i64, EpisodeState> = HashMap::new();
+    let mut selected_episodes = HashSet::new();
 
     for parquet_file in &scan.parquet_files {
         if issues.len() >= MAX_ISSUES_PER_CHECK {
@@ -70,6 +71,9 @@ pub fn run(scan: &DatasetScan, config: &ValidationConfig) -> Vec<Issue> {
                 let episode = episode_idx
                     .and_then(|idx| value_as_i64(batch.column(idx).as_ref(), row))
                     .unwrap_or(0);
+                if !allow_episode(config.max_episodes, &mut selected_episodes, episode) {
+                    continue;
+                }
                 let state = episode_states.entry(episode).or_default();
 
                 if let Some(timestamp_col_idx) = timestamp_idx {
@@ -285,5 +289,21 @@ fn value_as_f64(array: &dyn Array, row: usize) -> Option<f64> {
         DataType::Float64 => Some(array.as_any().downcast_ref::<Float64Array>()?.value(row)),
         DataType::Float32 => Some(array.as_any().downcast_ref::<Float32Array>()?.value(row) as f64),
         _ => value_as_i64(array, row).map(|v| v as f64),
+    }
+}
+
+fn allow_episode(max_episodes: Option<usize>, selected: &mut HashSet<i64>, episode: i64) -> bool {
+    match max_episodes {
+        Some(limit) if limit > 0 => {
+            if selected.contains(&episode) {
+                true
+            } else if selected.len() < limit {
+                selected.insert(episode);
+                true
+            } else {
+                false
+            }
+        }
+        _ => true,
     }
 }

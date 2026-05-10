@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use arrow_array::{
     Array, Float32Array, Float64Array, Int16Array, Int32Array, Int64Array, Int8Array, UInt16Array,
@@ -41,6 +41,7 @@ pub fn run(scan: &DatasetScan, config: &ValidationConfig) -> Vec<Issue> {
             Err(_) => continue,
         };
         let schema = builder.schema().clone();
+        let episode_col_idx = schema.index_of("episode_index").ok();
         let mut reader = match builder.with_batch_size(2048).build() {
             Ok(reader) => reader,
             Err(_) => continue,
@@ -61,6 +62,7 @@ pub fn run(scan: &DatasetScan, config: &ValidationConfig) -> Vec<Issue> {
 
         let mut stats_by_col: HashMap<String, ColumnStats> = HashMap::new();
         let mut seen_rows = 0usize;
+        let mut selected_episodes = HashSet::new();
 
         for batch in &mut reader {
             let Ok(batch) = batch else { continue };
@@ -68,6 +70,15 @@ pub fn run(scan: &DatasetScan, config: &ValidationConfig) -> Vec<Issue> {
                 if seen_rows >= config.max_rows_per_parquet {
                     break;
                 }
+
+                if let Some(ep_col_idx) = episode_col_idx {
+                    if let Some(episode) = value_as_i64(batch.column(ep_col_idx).as_ref(), row) {
+                        if !allow_episode(config.max_episodes, &mut selected_episodes, episode) {
+                            continue;
+                        }
+                    }
+                }
+
                 seen_rows += 1;
 
                 for (column_idx, column_name) in &numeric_indices {
@@ -269,5 +280,38 @@ fn value_as_f64(array: &dyn Array, row: usize) -> Option<f64> {
         DataType::UInt16 => Some(array.as_any().downcast_ref::<UInt16Array>()?.value(row) as f64),
         DataType::UInt8 => Some(array.as_any().downcast_ref::<UInt8Array>()?.value(row) as f64),
         _ => None,
+    }
+}
+
+fn value_as_i64(array: &dyn Array, row: usize) -> Option<i64> {
+    if array.is_null(row) {
+        return None;
+    }
+    match array.data_type() {
+        DataType::Int64 => Some(array.as_any().downcast_ref::<Int64Array>()?.value(row)),
+        DataType::Int32 => Some(array.as_any().downcast_ref::<Int32Array>()?.value(row) as i64),
+        DataType::Int16 => Some(array.as_any().downcast_ref::<Int16Array>()?.value(row) as i64),
+        DataType::Int8 => Some(array.as_any().downcast_ref::<Int8Array>()?.value(row) as i64),
+        DataType::UInt64 => Some(array.as_any().downcast_ref::<UInt64Array>()?.value(row) as i64),
+        DataType::UInt32 => Some(array.as_any().downcast_ref::<UInt32Array>()?.value(row) as i64),
+        DataType::UInt16 => Some(array.as_any().downcast_ref::<UInt16Array>()?.value(row) as i64),
+        DataType::UInt8 => Some(array.as_any().downcast_ref::<UInt8Array>()?.value(row) as i64),
+        _ => None,
+    }
+}
+
+fn allow_episode(max_episodes: Option<usize>, selected: &mut HashSet<i64>, episode: i64) -> bool {
+    match max_episodes {
+        Some(limit) if limit > 0 => {
+            if selected.contains(&episode) {
+                true
+            } else if selected.len() < limit {
+                selected.insert(episode);
+                true
+            } else {
+                false
+            }
+        }
+        _ => true,
     }
 }

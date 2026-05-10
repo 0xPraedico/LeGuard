@@ -11,6 +11,10 @@ pub struct CheckToggles {
     pub video: bool,
     pub numerical: bool,
     pub annotation: bool,
+    pub consistency: bool,
+    pub episodes: bool,
+    pub training: bool,
+    pub portability: bool,
 }
 
 impl Default for CheckToggles {
@@ -22,6 +26,10 @@ impl Default for CheckToggles {
             video: true,
             numerical: true,
             annotation: true,
+            consistency: true,
+            episodes: true,
+            training: true,
+            portability: true,
         }
     }
 }
@@ -36,6 +44,8 @@ pub struct ValidationConfig {
     pub checks: CheckToggles,
     #[serde(default = "default_max_rows")]
     pub max_rows_per_parquet: usize,
+    #[serde(default)]
+    pub max_episodes: Option<usize>,
 }
 
 const fn default_max_rows() -> usize {
@@ -51,6 +61,7 @@ impl Default for ValidationConfig {
             max_timestamp_gap_ms_error: Some(500.0),
             checks: CheckToggles::default(),
             max_rows_per_parquet: default_max_rows(),
+            max_episodes: None,
         }
     }
 }

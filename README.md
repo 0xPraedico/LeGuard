@@ -11,10 +11,12 @@
 
 LeGuard is an open-source QA and CI toolkit for LeRobot datasets. It validates dataset structure and data integrity, generates machine-readable and human-readable reports, and compares quality issues between two validation runs.
 
+Live Space: [https://huggingface.co/spaces/praedico/LeGuard](https://huggingface.co/spaces/praedico/LeGuard)
+
 ## Core Capabilities
 
-- `leguard-core`: dataset scanning, validation checks (structure/schema/temporal/video/numerical/annotation), and issue diffing.
-- `leguard-cli`: stable command-line interface with `check`, `report`, and `diff`.
+- `leguard-core`: dataset scanning, validation checks (`structure`, `schema`, `consistency`, `episodes`, `temporal`, `numerical`, `video`, `annotation`, `training`, `portability`), and issue diffing.
+- `leguard-cli`: command-line interface with `check`, `report`, and `diff`, including direct Hugging Face dataset support.
 - `leguard-report`: report rendering in `json`, `html`, `markdown`, and `junit`.
 - `packages/github-action`: plug-and-play CI quality gate for GitHub Actions.
 
@@ -45,6 +47,18 @@ cargo run -p leguard-cli -- diff clean-report.json broken-report.json --format j
 
 ## Validate a Hugging Face Dataset
 
+You can now run `check` directly from an HF repo id:
+
+```bash
+cargo run -p leguard-cli -- check praedico/SO101_pillbox_vita --fail-on error --max-episodes 20 --checks structure,schema,consistency,episodes,training,portability
+```
+
+### Useful `check` options
+
+- `--checks`: comma-separated subset of checks to run.
+- `--max-episodes`: cap validation to the first N episodes for faster diagnostics on large datasets.
+- `--fail-on error|warning`: choose the gate policy for exit code behavior.
+
 Use the Hugging Face CLI to download dataset files directly from the Hub, then run LeGuard on the local download:
 
 ```bash
@@ -61,6 +75,18 @@ make hf-download HF_DATASET=praedico/SO101_pillbox_vita HF_LOCAL_DIR=hf-datasets
 make hf-check HF_LOCAL_DIR=hf-datasets/SO101_pillbox_vita HF_FAIL_ON=error
 make hf-report HF_LOCAL_DIR=hf-datasets/SO101_pillbox_vita HF_REPORT_JSON=so101-report.json HF_REPORT_HTML=so101-report.html
 ```
+
+## Hugging Face Space Deployment
+
+This repository includes a dedicated Space bundle in `space/`:
+
+Live Space: [https://huggingface.co/spaces/praedico/LeGuard](https://huggingface.co/spaces/praedico/LeGuard)
+
+- `space/Dockerfile`
+- `space/app.py`
+- `space/requirements.txt`
+- `space/README.md`
+
 
 ## Understanding Command Outputs
 
