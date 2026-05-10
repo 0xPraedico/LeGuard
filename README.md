@@ -2,8 +2,6 @@
 
 ![LeGuard banner](assets/leguard-banner.png)
 
-[![CI](https://github.com/praedico/LeGuard/actions/workflows/ci.yml/badge.svg)](https://github.com/praedico/LeGuard/actions/workflows/ci.yml)
-[![Release](https://github.com/praedico/LeGuard/actions/workflows/release.yml/badge.svg)](https://github.com/praedico/LeGuard/actions/workflows/release.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Status: alpha](https://img.shields.io/badge/status-alpha-orange.svg)](./CHANGELOG.md)
 [![Rust](https://img.shields.io/badge/rust-2021-black.svg?logo=rust)](https://www.rust-lang.org/)
