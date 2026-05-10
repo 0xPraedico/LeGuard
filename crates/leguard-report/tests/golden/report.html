@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LeGuard report</title>
+  <style>
+    body { font-family: Inter, Segoe UI, Arial, sans-serif; margin: 24px; background: #0b1020; color: #e5e7eb; }
+    h1, h2 { margin-bottom: 8px; }
+    .grid { display: grid; grid-template-columns: repeat(3, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    .card { background: #111827; border: 1px solid #1f2937; border-radius: 8px; padding: 12px; }
+    .label { color: #9ca3af; font-size: 12px; text-transform: uppercase; }
+    .value { font-size: 22px; font-weight: 600; margin-top: 4px; }
+    table { width: 100%; border-collapse: collapse; background: #111827; border-radius: 8px; overflow: hidden; }
+    th, td { text-align: left; border-bottom: 1px solid #1f2937; padding: 8px; font-size: 13px; vertical-align: top; }
+    th { background: #0f172a; color: #cbd5e1; }
+    .toolbar { display: flex; gap: 10px; margin-bottom: 12px; }
+    input, select { background: #0f172a; color: #e5e7eb; border: 1px solid #334155; border-radius: 6px; padding: 6px 10px; }
+  </style>
+</head>
+<body>
+  <h1>LeGuard report</h1>
+  <p>Dataset: <strong>pick_place</strong> | Generated: 2026-05-09 12:03:01 UTC</p>
+  <div class="grid">
+    <div class="card"><div class="label">Status</div><div class="value">FAILED</div></div>
+    <div class="card"><div class="label">Issues</div><div class="value">5</div></div>
+    <div class="card"><div class="label">Errors</div><div class="value">2</div></div>
+    <div class="card"><div class="label">Warnings</div><div class="value">3</div></div>
+    <div class="card"><div class="label">Infos</div><div class="value">0</div></div>
+  </div>
+
+  <h2>Issues</h2>
+  <div class="toolbar">
+    <select id="severity">
+      <option value="">All severities</option>
+      <option value="error">Error</option>
+      <option value="warning">Warning</option>
+      <option value="info">Info</option>
+    </select>
+    <select id="category">
+      <option value="">All categories</option>
+      <option value="structure">Structure</option>
+      <option value="schema">Schema</option>
+      <option value="temporal">Temporal</option>
+      <option value="video">Video</option>
+      <option value="numerical">Numerical</option>
+      <option value="annotation">Annotation</option>
+    </select>
+    <input id="search" type="text" placeholder="Search check/message/file...">
+  </div>
+  <table>
+    <thead>
+      <tr><th>Severity</th><th>Category</th><th>Check</th><th>Title</th><th>Message</th><th>File</th></tr>
+    </thead>
+    <tbody id="issues-body">
+      <tr data-severity="error" data-category="temporal"><td>error</td><td>temporal</td><td>temporal.non_monotonic_timestamp</td><td>Non-monotonic timestamp</td><td>episode_000034 has non-monotonic timestamps at frames 812-813</td><td>data/chunk-000.parquet</td></tr>
+<tr data-severity="error" data-category="video"><td>error</td><td>video</td><td>video.missing_file</td><td>Missing video file</td><td>Missing video file for episode_000091 / observation.images.wrist</td><td>videos/wrist/episode_000091.mp4</td></tr>
+<tr data-severity="warning" data-category="schema"><td>warning</td><td>schema</td><td>schema.missing_common_column</td><td>Missing common column</td><td>Column observation.state is missing from one parquet shard</td><td>data/chunk-001.parquet</td></tr>
+<tr data-severity="warning" data-category="numerical"><td>warning</td><td>numerical</td><td>numerical.nan</td><td>NaN values detected</td><td>42 NaN values found in numeric column action</td><td>-</td></tr>
+<tr data-severity="warning" data-category="annotation"><td>warning</td><td>annotation</td><td>annotation.overlapping_segments</td><td>Overlapping subtasks</td><td>episode_000033 has overlapping subtasks: grasp and lift</td><td>-</td></tr>
+    </tbody>
+  </table>
+
+  <script>
+    const severityEl = document.getElementById('severity');
+    const categoryEl = document.getElementById('category');
+    const searchEl = document.getElementById('search');
+    const rows = Array.from(document.querySelectorAll('#issues-body tr'));
+    function applyFilters() {
+      const severity = severityEl.value;
+      const category = categoryEl.value;
+      const query = searchEl.value.toLowerCase();
+      rows.forEach((row) => {
+        const matchesSeverity = !severity || row.dataset.severity === severity;
+        const matchesCategory = !category || row.dataset.category === category;
+        const matchesQuery = !query || row.textContent.toLowerCase().includes(query);
+        row.style.display = matchesSeverity && matchesCategory && matchesQuery ? '' : 'none';
+      });
+    }
+    severityEl.addEventListener('change', applyFilters);
+    categoryEl.addEventListener('change', applyFilters);
+    searchEl.addEventListener('input', applyFilters);
+  </script>
+</body>
+</html>

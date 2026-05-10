@@ -1,0 +1,106 @@
+{
+  "schema_version": "1.0.0",
+  "leguard_version": "0.1.0",
+  "dataset": {
+    "name": "pick_place",
+    "format": "lerobot-v3",
+    "uri": "local://data/pick_place",
+    "source_type": "local",
+    "episodes": 142,
+    "frames": 182430,
+    "duration_sec": 6060,
+    "cameras": ["front", "wrist"],
+    "parquet_files": 12,
+    "video_files": 284,
+    "metadata_files": 10,
+    "empty_files": 0,
+    "total_files": 320
+  },
+  "run": {
+    "source": "cli",
+    "git_commit": "abc123",
+    "git_branch": "main",
+    "git_repo": "https://github.com/acme/robot-data",
+    "dataset_revision": "v14",
+    "started_at": "2026-05-09T12:00:00Z",
+    "finished_at": "2026-05-09T12:03:00Z"
+  },
+  "issue_counts": {
+    "total": 5,
+    "errors": 2,
+    "warnings": 3,
+    "infos": 0
+  },
+  "issues": [
+    {
+      "fingerprint": "sample-temporal-001",
+      "severity": "error",
+      "category": "temporal",
+      "check_id": "temporal.non_monotonic_timestamp",
+      "title": "Non-monotonic timestamp",
+      "message": "episode_000034 has non-monotonic timestamps at frames 812-813",
+      "suggestion": "Re-record or remove the affected episode.",
+      "file_path": "data/chunk-000.parquet",
+      "episode_index": 34,
+      "frame_index": 812,
+      "timestamp_sec": 18.42,
+      "feature": "timestamp",
+      "expected": { "monotonic": true },
+      "actual": { "delta_ms": -33.2 },
+      "metadata": { "camera": "front" }
+    },
+    {
+      "fingerprint": "sample-video-001",
+      "severity": "error",
+      "category": "video",
+      "check_id": "video.missing_file",
+      "title": "Missing video file",
+      "message": "Missing video file for episode_000091 / observation.images.wrist",
+      "suggestion": "Restore the missing video or remove the episode.",
+      "file_path": "videos/wrist/episode_000091.mp4",
+      "episode_index": 91,
+      "feature": "observation.images.wrist",
+      "expected": { "exists": true },
+      "actual": { "exists": false },
+      "metadata": {}
+    },
+    {
+      "fingerprint": "sample-schema-001",
+      "severity": "warning",
+      "category": "schema",
+      "check_id": "schema.missing_common_column",
+      "title": "Missing common column",
+      "message": "Column observation.state is missing from one parquet shard",
+      "file_path": "data/chunk-001.parquet",
+      "feature": "observation.state",
+      "expected": { "column_present": true },
+      "actual": { "column_present": false },
+      "metadata": {}
+    },
+    {
+      "fingerprint": "sample-numerical-001",
+      "severity": "warning",
+      "category": "numerical",
+      "check_id": "numerical.nan",
+      "title": "NaN values detected",
+      "message": "42 NaN values found in numeric column action",
+      "feature": "action",
+      "expected": { "nan_count": 0 },
+      "actual": { "nan_count": 42 },
+      "metadata": {}
+    },
+    {
+      "fingerprint": "sample-annotation-001",
+      "severity": "warning",
+      "category": "annotation",
+      "check_id": "annotation.overlapping_segments",
+      "title": "Overlapping subtasks",
+      "message": "episode_000033 has overlapping subtasks: grasp and lift",
+      "episode_index": 33,
+      "expected": { "overlap": false },
+      "actual": { "overlap": true },
+      "metadata": { "subtasks": ["grasp", "lift"] }
+    }
+  ],
+  "generated_at": "2026-05-09T12:03:01Z"
+}

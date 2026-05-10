@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="leguard" tests="5" failures="2" warnings="3">
+  <testcase classname="temporal" name="temporal.non_monotonic_timestamp">
+    <failure message="Non-monotonic timestamp">episode_000034 has non-monotonic timestamps at frames 812-813</failure>
+  </testcase>
+  <testcase classname="video" name="video.missing_file">
+    <failure message="Missing video file">Missing video file for episode_000091 / observation.images.wrist</failure>
+  </testcase>
+  <testcase classname="schema" name="schema.missing_common_column">
+    <system-out>warning: Column observation.state is missing from one parquet shard</system-out>
+  </testcase>
+  <testcase classname="numerical" name="numerical.nan">
+    <system-out>warning: 42 NaN values found in numeric column action</system-out>
+  </testcase>
+  <testcase classname="annotation" name="annotation.overlapping_segments">
+    <system-out>warning: episode_000033 has overlapping subtasks: grasp and lift</system-out>
+  </testcase>
+</testsuite>

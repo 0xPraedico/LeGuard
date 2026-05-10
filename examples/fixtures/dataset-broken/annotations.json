@@ -1,0 +1,26 @@
+[
+  {
+    "episode_index": 0,
+    "label": "",
+    "start_sec": 1.2,
+    "end_sec": 0.9
+  },
+  {
+    "episode_index": 0,
+    "label": "grasp",
+    "start_sec": 2.0,
+    "end_sec": 3.0
+  },
+  {
+    "episode_index": 0,
+    "label": "lift",
+    "start_sec": 2.7,
+    "end_sec": 3.8
+  },
+  {
+    "episode_index": 1,
+    "label": "move",
+    "start_sec": -0.2,
+    "end_sec": 0.5
+  }
+]

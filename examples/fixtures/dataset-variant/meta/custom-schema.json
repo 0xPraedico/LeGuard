@@ -1,0 +1,11 @@
+{
+  "description": "Exemple de dataset LeRobot variant avec taxonomie custom",
+  "columns": [
+    "episode_index",
+    "frame_index",
+    "timestamp",
+    "action",
+    "observation.images.front"
+  ],
+  "note": "Utiliser examples/variant-config.yml pour assouplir certains checks."
+}

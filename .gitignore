@@ -1,0 +1,19 @@
+/target
+/.DS_Store
+**/*.log
+
+# Local Hugging Face dataset downloads
+/hf-datasets/
+/SO101_pillbox_vita/
+/SO101_pillbox_vita-full/
+/.cache/huggingface/
+
+# Local report artifacts generated from CLI
+/report.json
+/report.html
+/report.md
+/report.junit.xml
+/*-report.json
+/*-report.html
+/*-report.md
+/*-report.junit.xml

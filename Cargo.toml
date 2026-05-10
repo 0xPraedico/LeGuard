@@ -1,0 +1,31 @@
+[workspace]
+members = [
+  "crates/leguard-core",
+  "crates/leguard-cli",
+  "crates/leguard-report",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+authors = ["LeGuard contributors"]
+repository = "https://github.com/praedico/LeGuard"
+
+[workspace.dependencies]
+anyhow = "1.0"
+arrow-array = "53.4"
+arrow-schema = "53.4"
+blake3 = "1.5"
+chrono = { version = "0.4", features = ["serde"] }
+clap = { version = "4.5", features = ["derive"] }
+parquet = { version = "53.4", features = ["arrow"] }
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls", "blocking"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde_yaml = "0.9"
+thiserror = "2.0"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
+walkdir = "2.5"

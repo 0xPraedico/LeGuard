@@ -1,0 +1,44 @@
+name: "LeGuard Quality Gate"
+description: "Run LeGuard check/report on LeRobot datasets in CI"
+author: "LeGuard contributors"
+
+inputs:
+  dataset-path:
+    description: "Path to dataset root"
+    required: true
+  fail-on:
+    description: "Fail policy: error or warning"
+    required: false
+    default: "error"
+  report-format:
+    description: "Report format: json, html, markdown, junit"
+    required: false
+    default: "junit"
+  report-out:
+    description: "Output report path"
+    required: false
+    default: "leguard-report.junit.xml"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install Rust stable
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Install LeGuard binary
+      shell: bash
+      run: |
+        set -euo pipefail
+        cargo install --path "${{ github.action_path }}/../../crates/leguard-cli" --bin leguard --locked --force
+
+    - name: Run quality gate
+      shell: bash
+      run: |
+        set -euo pipefail
+        leguard check "${{ inputs.dataset-path }}" --fail-on "${{ inputs.fail-on }}"
+
+    - name: Generate report
+      shell: bash
+      run: |
+        set -euo pipefail
+        leguard report "${{ inputs.dataset-path }}" --format "${{ inputs.report-format }}" --out "${{ inputs.report-out }}"

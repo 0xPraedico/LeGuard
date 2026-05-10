@@ -1,0 +1,20 @@
+[package]
+name = "leguard-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "leguard"
+path = "src/main.rs"
+
+[dependencies]
+anyhow.workspace = true
+clap.workspace = true
+leguard-core = { path = "../leguard-core" }
+leguard-report = { path = "../leguard-report" }
+serde.workspace = true
+serde_json.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
