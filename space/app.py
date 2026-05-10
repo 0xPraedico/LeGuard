@@ -4,7 +4,6 @@ import shutil
 import subprocess
 import uuid
 from pathlib import Path
-from urllib.parse import quote
 
 import gradio as gr
 from huggingface_hub import snapshot_download
@@ -26,31 +25,7 @@ CHECK_ORDER = [
     "portability",
 ]
 
-BANNER_SVG = """
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 320" role="img" aria-label="LeGuard banner">
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0f172a" />
-      <stop offset="100%" stop-color="#1e293b" />
-    </linearGradient>
-    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#f59e0b" />
-      <stop offset="100%" stop-color="#f97316" />
-    </linearGradient>
-  </defs>
-  <rect width="1600" height="320" fill="url(#bg)" rx="28" />
-  <rect x="0" y="274" width="1600" height="46" fill="url(#accent)" />
-  <g transform="translate(76, 86)">
-    <circle cx="54" cy="54" r="54" fill="url(#accent)" />
-    <path d="M38 58l13 13 26-32" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
-  </g>
-  <text x="220" y="146" fill="#ffffff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="78" font-weight="800">LeGuard</text>
-  <text x="222" y="198" fill="#cbd5e1" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="28" font-weight="500">
-    QA and CI toolkit for LeRobot datasets
-  </text>
-</svg>
-"""
-BANNER_DATA_URI = "data:image/svg+xml;utf8," + quote(BANNER_SVG)
+BANNER_URL = "https://raw.githubusercontent.com/0xPraedico/LeGuard/main/assets/leguard-banner.png"
 REPO_URL = "https://github.com/0xPraedico/LeGuard"
 ISSUES_URL = f"{REPO_URL}/issues"
 
@@ -739,7 +714,7 @@ with gr.Blocks(
         gr.HTML(
             f"""
             <div class="hero-card">
-              <img src="{BANNER_DATA_URI}" alt="LeGuard banner" />
+              <img src="{BANNER_URL}" alt="LeGuard banner" />
               <h1>LeGuard Space</h1>
               <p>Run LeGuard diagnostics on Hugging Face LeRobot datasets and export actionable reports.</p>
               <div class="hero-links"><a href="{REPO_URL}" target="_blank" rel="noopener noreferrer">GitHub</a></div>
