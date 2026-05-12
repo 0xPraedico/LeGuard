@@ -34,11 +34,12 @@ BOOTSTRAP_JS = """
   const root = document.documentElement;
 
   const applyTheme = (mode) => {
-    const normalized = String(mode || "system").toLowerCase();
-    root.setAttribute("data-leguard-theme", normalized);
+    const normalized = String(mode || "light").toLowerCase();
+    const finalMode = normalized === "light" ? "light" : "dark";
+    root.setAttribute("data-leguard-theme", finalMode);
   };
   window.__leguardApplyTheme = applyTheme;
-  applyTheme("system");
+  applyTheme("light");
 
   const localizeFooter = () => {
     const localizedBuiltWith = [67, 114, 233, 233, 32, 97, 118, 101, 99]
@@ -111,6 +112,8 @@ html[data-leguard-theme="light"] {
   --lg-text: #111827;
   --lg-muted: #5b6473;
   --lg-accent: #4f46e5;
+  --lg-label-color: #5b6473;
+  --lg-info-color: #4f46e5;
   --lg-accent-soft: #e0e7ff;
   --lg-input-bg: #ffffff;
   --lg-input-border: #c7d2e5;
@@ -125,26 +128,12 @@ html[data-leguard-theme="dark"] {
   --lg-text: #e7eefc;
   --lg-muted: #93a9c9;
   --lg-accent: #22d3ee;
+  --lg-label-color: #5b6473;
+  --lg-info-color: #4f46e5;
   --lg-accent-soft: #14324a;
   --lg-input-bg: #09162d;
   --lg-input-border: #1b3d68;
   --lg-input-text: #dbeafe;
-}
-
-@media (prefers-color-scheme: dark) {
-  html[data-leguard-theme="system"] {
-    --lg-page-bg: #060c1b;
-    --lg-panel-bg: #0a1226;
-    --lg-surface-bg: #0d1a34;
-    --lg-border: #19345c;
-    --lg-text: #e7eefc;
-    --lg-muted: #93a9c9;
-    --lg-accent: #22d3ee;
-    --lg-accent-soft: #14324a;
-    --lg-input-bg: #09162d;
-    --lg-input-border: #1b3d68;
-    --lg-input-text: #dbeafe;
-  }
 }
 
 .gradio-container {
@@ -191,10 +180,16 @@ html[data-leguard-theme="dark"] {
 }
 
 .gradio-container label,
+.gradio-container legend,
+.gradio-container .gr-form label,
+.gradio-container .gr-block label,
 .gradio-container .caption,
 .gradio-container [data-testid="block-label"],
-.gradio-container .svelte-1ipelgc {
-  color: var(--lg-muted) !important;
+.gradio-container .svelte-1ipelgc,
+.gradio-container [data-testid="block-label"] *,
+.gradio-container .svelte-1ipelgc * {
+  color: var(--lg-label-color) !important;
+  opacity: 1 !important;
 }
 
 .gradio-container .prose,
@@ -223,6 +218,24 @@ html[data-leguard-theme="dark"] {
 .gradio-container .prose a,
 .gradio-container .markdown a {
   color: var(--lg-accent) !important;
+}
+
+.gradio-container [data-testid="block-info"],
+.gradio-container .block-info,
+.gradio-container .gradio-info,
+.gradio-container [data-testid="block-info"] *,
+.gradio-container .block-info *,
+.gradio-container .gradio-info * {
+  color: var(--lg-info-color) !important;
+  opacity: 1 !important;
+}
+
+.field-help {
+  margin-top: 4px;
+  font-size: 0.78rem;
+  line-height: 1.25;
+  color: var(--lg-info-color) !important;
+  opacity: 1 !important;
 }
 
 .app-container {
@@ -278,12 +291,6 @@ html[data-leguard-theme="dark"] {
 
 html[data-leguard-theme="dark"] .run-btn button {
   background: linear-gradient(90deg, #0ea5e9, #06b6d4) !important;
-}
-
-@media (prefers-color-scheme: dark) {
-  html[data-leguard-theme="system"] .run-btn button {
-    background: linear-gradient(90deg, #0ea5e9, #06b6d4) !important;
-  }
 }
 
 .refresh-btn button {
@@ -348,26 +355,6 @@ html[data-leguard-theme="dark"] .status-fail {
   background: #3a0b10 !important;
   color: #fca5a5 !important;
   border: 1px solid #b91c1c !important;
-}
-
-@media (prefers-color-scheme: dark) {
-  html[data-leguard-theme="system"] .status-pass {
-    background: #052e1f !important;
-    color: #86efac !important;
-    border: 1px solid #166534 !important;
-  }
-
-  html[data-leguard-theme="system"] .status-warn {
-    background: #3b2206 !important;
-    color: #fdba74 !important;
-    border: 1px solid #9a5800 !important;
-  }
-
-  html[data-leguard-theme="system"] .status-fail {
-    background: #3a0b10 !important;
-    color: #fca5a5 !important;
-    border: 1px solid #b91c1c !important;
-  }
 }
 
 .metrics-grid {
@@ -557,8 +544,12 @@ def build_runtime_config(selected_checks, max_episodes):
         enabled = "true" if check_name in selected else "false"
         lines.append(f"  {check_name}: {enabled}")
 
-    if max_episodes and int(max_episodes) > 0:
-        lines.append(f"max_episodes: {int(max_episodes)}")
+    if max_episodes is not None:
+        parsed_max_episodes = int(max_episodes)
+        if parsed_max_episodes < 0:
+            raise ValueError("Max episodes must be 0 or a positive integer.")
+        if parsed_max_episodes > 0:
+            lines.append(f"max_episodes: {parsed_max_episodes}")
 
     return "\n".join(lines) + "\n"
 
@@ -728,16 +719,17 @@ with gr.Blocks(
                 placeholder="praedico/SO101_pillbox_vita",
                 scale=4,
             )
-            max_episodes = gr.Number(
-                label="Max episodes (optional)",
-                value=None,
-                precision=0,
-                minimum=0,
-                scale=1,
-            )
+            with gr.Column(scale=1):
+                max_episodes = gr.Number(
+                    label="Max episodes (optional)",
+                    value=0,
+                    precision=0,
+                    minimum=0,
+                )
+                gr.HTML("<div class='field-help'>Set 0 to validate all episodes.</div>")
             theme_mode = gr.Radio(
-                [("System", "system"), ("Light", "light"), ("Dark", "dark")],
-                value="system",
+                [("Light", "light"), ("Dark", "dark")],
+                value="light",
                 label="Theme mode",
                 scale=1,
             )

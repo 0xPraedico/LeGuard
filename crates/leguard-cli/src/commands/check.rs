@@ -91,10 +91,11 @@ struct ResolvedDataset {
 
 fn apply_cli_overrides(config: &mut ValidationConfig, command: &CheckCommand) -> Result<()> {
     if let Some(max_episodes) = command.max_episodes {
-        if max_episodes == 0 {
-            bail!("--max-episodes must be greater than 0");
-        }
-        config.max_episodes = Some(max_episodes);
+        config.max_episodes = if max_episodes == 0 {
+            None
+        } else {
+            Some(max_episodes)
+        };
     }
     if let Some(raw_checks) = command.checks.as_deref() {
         apply_checks_override(config, raw_checks)?;

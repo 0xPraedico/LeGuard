@@ -284,6 +284,10 @@ fn collect_episode_lengths(scan: &DatasetScan, config: &ValidationConfig) -> Has
     let mut lengths = HashMap::new();
 
     for parquet_file in &scan.parquet_files {
+        if !parquet_file.relative_path.starts_with("data/") {
+            continue;
+        }
+
         let file = match std::fs::File::open(&parquet_file.path) {
             Ok(file) => file,
             Err(_) => continue,

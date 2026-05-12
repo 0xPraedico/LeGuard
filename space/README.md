@@ -1,5 +1,6 @@
 ---
 title: LeGuard
+short_description: Run diagnostics on LeRobot datasets from Hugging Face.
 colorFrom: yellow
 colorTo: yellow
 sdk: docker
