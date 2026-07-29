@@ -15,7 +15,7 @@ repository = "https://github.com/praedico/LeGuard"
 
 [workspace.dependencies]
 anyhow = "1.0"
-arrow-array = "53.4"
+arrow-array = "54.2"
 arrow-schema = "53.4"
 blake3 = "1.5"
 chrono = { version = "0.4", features = ["serde"] }
